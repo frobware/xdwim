@@ -18,7 +18,7 @@ def switch_to_window(classname):
     print("classname topmost_window", topmost_window)
     active_window = xdo.get_active_window()
     print("active_window", active_window)
-    if topmost_window == active_window and len(windows) >= 1:
+    if topmost_window == active_window and len(windows) > 0:
         topmost_window = windows.pop()
         print("classname, selecting next window", topmost_window)
     if topmost_window != active_window:
