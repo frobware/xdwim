@@ -1,0 +1,2 @@
+# xdwim
+Make xdotool DWIM
