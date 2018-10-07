@@ -1,0 +1,9 @@
+[Unit]
+Description=xdwim Service
+
+[Service]
+ExecStart=%h/.local/bin/xdwim
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
