@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=xdwim
+GenericName=xdwim
+Comment=Start these up at login
+Exec=/home/aim/.local/bin/xdwim
+Terminal=False
+Type=Application
+X-GNOME-Autostart-enabled=true
