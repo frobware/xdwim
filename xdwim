@@ -3,6 +3,8 @@
 import sys
 import os
 import SocketServer
+import atexit
+import argparse
 
 from xdo import Xdo
 
@@ -33,16 +35,24 @@ class Handler(SocketServer.StreamRequestHandler):
             self.finish()
         return
 
-server_address = '/tmp/xdwim.sock'
+def cleanup():
+    if os.path.exists(server_address):
+        os.remove(server_address)
 
-if os.path.exists(server_address):
-    os.remove(server_address)
-
-xdo = Xdo()
-svr = SocketServer.UnixStreamServer(server_address, Handler, True)
-
-try:
-    svr.serve_forever()
-except (KeyboardInterrupt, SystemExit):
-    os.remove(server_address)
+def main():
+    if os.path.exists(server_address):
+        os.remove(server_address)
+    svr = SocketServer.UnixStreamServer(server_address, Handler, True)
+    try:
+        svr.serve_forever()
+    except (KeyboardInterrupt, SystemExit):
+        os.remove(server_address)
     pass
+
+server_address = '/tmp/xdwim.sock'
+atexit.register(cleanup)
+xdo = Xdo()
+parser = argparse.ArgumentParser()
+parser.add_argument('--debug', action='store_true', default=False)
+args = parser.parse_args()
+main()
