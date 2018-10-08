@@ -11,18 +11,13 @@ def switch_to_window(classname):
                                  desktop=xdo.get_current_desktop(),
                                  only_visible=True,
                                  require=True)
-    print("classname", len(windows), windows)
     if not windows:
         return False
     topmost_window = windows.pop()
-    print("classname topmost_window", topmost_window)
     active_window = xdo.get_active_window()
-    print("active_window", active_window)
     if topmost_window == active_window and len(windows) > 0:
         topmost_window = windows.pop()
-        print("classname, selecting next window", topmost_window)
     if topmost_window != active_window:
-        print("activating", topmost_window)
         xdo.activate_window(topmost_window)
         xdo.focus_window(topmost_window)
     return True
@@ -30,7 +25,6 @@ def switch_to_window(classname):
 class Handler(SocketServer.StreamRequestHandler):
     def handle(self):
         self.data = self.rfile.readline().strip()
-        print(self.data)
         if self.data:
             if switch_to_window(self.data.split()[0]):
                 self.request.sendall("success")
