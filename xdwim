@@ -29,10 +29,9 @@ class Handler(SocketServer.StreamRequestHandler):
         self.data = self.rfile.readline().strip()
         if self.data:
             if switch_to_window(self.data.split()[0]):
-                self.request.sendall("success")
+                self.request.sendall("success\n")
             else:
-                self.request.sendall("failed")
-            self.finish()
+                self.request.sendall("failed\n")
         return
 
 def cleanup():

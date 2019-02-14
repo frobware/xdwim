@@ -12,7 +12,7 @@ try:
     sock.connect(server_address)
     sock.sendall(sys.argv[1] + "\n")
     data = sock.recv(32)
-    if data != "success":
+    if data != "success\n":
         subprocess.Popen(sys.argv[2:], close_fds=True)
 finally:
     sock.close()
