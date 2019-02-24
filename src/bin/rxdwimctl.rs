@@ -45,7 +45,10 @@ fn main() {
         Err(err) => panic!("couldn't read message: {}", err),
         Ok(_) => {
             if !line.starts_with("success") {
-                Command::new(&args[2]).args(&args[3..]).spawn();
+                match Command::new(&args[2]).args(&args[3..]).spawn() {
+                    Err(err) => panic!("couldn't spawn for client {}: {}", args[1], err),
+                    Ok(_) => {}
+                }
             }
         }
     }
