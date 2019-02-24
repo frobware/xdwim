@@ -1,3 +1,5 @@
+extern crate xdwim;
+
 use std::env;
 use std::os::unix::net::UnixStream;
 use std::path::Path;
@@ -5,8 +7,6 @@ use std::io::Write;
 use std::io::BufReader;
 use std::io::BufRead;
 use std::process::Command;
-
-extern crate xdwim;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -44,12 +44,14 @@ fn main() {
     match reader.read_line(&mut line) {
         Err(err) => panic!("couldn't read message: {}", err),
         Ok(_) => {
+/*
             if !line.starts_with("success") {
                 match Command::new(&args[2]).args(&args[3..]).spawn() {
                     Err(err) => panic!("couldn't spawn for client {}: {}", args[1], err),
                     Ok(_) => {}
                 }
             }
+*/
         }
     }
 }

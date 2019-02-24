@@ -9,22 +9,37 @@ use std::ptr;
 
 use libxdo_sys::xdo_free;
 use libxdo_sys::xdo_new;
+//use libxdo_sys::xdo_search_windows;
 use libxdo_sys::xdo_t;
 
-fn handle_client(_xdo: *mut xdo_t, stream: UnixStream) {
+// pub fn xdo_search_windows(xdo: *const xdo_t, search: *const xdo_search_t,
+//                           windowlist_ret: *mut *mut Window,
+//                           nwindows_ret: *mut ::libc::c_uint)
+
+fn switch_to_window(_xdo: *mut xdo_t, client: &str) {
+    println!("lookig for X11 client: {}", client);
+}
+
+fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
     let mut reader = BufReader::new(stream);
     let mut line = String::new();
 
     match reader.read_line(&mut line) {
         Err(err) => println!("couldn't read message: {}", err),
         Ok(_) => {
-            println!("You said: {}", line);
+            let v: Vec<&str> = line.split(' ').collect();
+
+            if v.len() > 0 {
+                println!("lookig for X11 client: {}", v[0]);
+                //xdo_search_windows(xdo);
+                switch_to_window(xdo, v[0]);
+            }
         }
     }
 }
 
 fn main() -> Result<(), Box<std::error::Error>> {
-    let xdo;
+    let xdo: *mut xdo_t;
 
     unsafe {
         xdo = xdo_new(ptr::null());
