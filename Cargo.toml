@@ -3,10 +3,5 @@ name = "xdwim"
 version = "0.1.0"
 authors = ["Andrew McDermott <aim@frobware.com>"]
 
-# [[bin]]
-# name = "rxdwim"
-# path = "src/rxdwim/bin/main.rs"
-
-# [[bin]]
-# name = "rxdwimctl"
-# path = "src/rxdwimctl/bin/main.rs"
+[dependencies]
+libxdo-sys = "0.11.0"
