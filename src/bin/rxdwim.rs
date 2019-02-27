@@ -1,24 +1,24 @@
-extern crate xdwim;
+extern crate libc;
 extern crate libxdo_sys;
+extern crate x11;
+extern crate xdwim;
 
+use libxdo_sys::*;
+use std::ffi::*;
+use std::fs;
 use std::io::BufRead;
 use std::io::BufReader;
-use std::os::unix::net::UnixStream;
 use std::os::unix::net::UnixListener;
+use std::os::unix::net::UnixStream;
 use std::ptr;
+use x11::xlib::Window;
 
-use libxdo_sys::xdo_free;
-use libxdo_sys::xdo_new;
-//use libxdo_sys::xdo_search_windows;
-use libxdo_sys::xdo_t;
+//#[link(name = "libxdo")]
 
-// pub fn xdo_search_windows(xdo: *const xdo_t, search: *const xdo_search_t,
-//                           windowlist_ret: *mut *mut Window,
-//                           nwindows_ret: *mut ::libc::c_uint)
-
-fn switch_to_window(_xdo: *mut xdo_t, client: &str) {
-    println!("lookig for X11 client: {}", client);
-}
+// unsafe fn switch_to_window(_xdo: *mut xdo_t, client: &str) -> bool {
+//     println!("looking for X11 client: {}", client);
+//     return true;
+// }
 
 fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
     let mut reader = BufReader::new(stream);
@@ -26,19 +26,43 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
 
     match reader.read_line(&mut line) {
         Err(err) => println!("couldn't read message: {}", err),
-        Ok(_) => {
-            let v: Vec<&str> = line.split(' ').collect();
+        Ok(_) => {}
+    }
 
-            if v.len() > 0 {
-                println!("lookig for X11 client: {}", v[0]);
-                //xdo_search_windows(xdo);
-                switch_to_window(xdo, v[0]);
-            }
+    let v: Vec<&str> = line.split(' ').collect();
+
+    if v.len() > 0 {
+        let mut search = Struct_xdo_search::default();
+
+        println!("{:?}", CString::new(v[0]).expect("no nul bytes"));
+
+        let cstr = CString::new(v[0]).expect("no nul bytes");
+
+        search.only_visible = 1;
+        search.require = SEARCH_ANY;
+        search.searchmask |= 1 << 6;
+        search.winclassname = cstr.as_ptr();
+        search.max_depth = -1;
+
+        unsafe {
+            //let windowlist_ret: *mut *mut Window = std::mem::uninitialized();
+            //let nwindows_ret: ::libc::c_uint = std::ptr::null_mut();
+            let mut v = std::mem::uninitialized();
+            let mut p = std::mem::uninitialized();
+            let r = xdo_search_windows(xdo, &search, &mut p, &mut v);
+
+            //let ptr = &p[1] as *const Window;
+
+            println!("xdo_search_windows: {}, count={}", r, v);
         }
+
+        let w: Window;
     }
 }
 
 fn main() -> Result<(), Box<std::error::Error>> {
+    fs::remove_file(xdwim::SOCKET_PATH)?;
+
     let xdo: *mut xdo_t;
 
     unsafe {

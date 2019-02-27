@@ -30,7 +30,9 @@ dependencies = [
 name = "xdwim"
 version = "0.1.0"
 dependencies = [
+ "libc 0.2.49 (registry+https://github.com/rust-lang/crates.io-index)",
  "libxdo-sys 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "x11 2.18.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [metadata]
