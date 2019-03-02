@@ -52,7 +52,18 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
             let mut p: *mut Window = std::mem::uninitialized();
             let res = xdo_search_windows(xdo, &search, &mut p, &mut v);
 
-            println!("xdo_search_windows: {}, count={}", res, v);
+            //std::slice::from_raw_parts
+
+            let slice = std::slice::from_raw_parts(p, v as usize);
+
+            for x in slice {
+                println!("{}", x);
+            }
+
+            println!(
+                "xdo_search_windows: {}, windowlist_re={:?}, count={}",
+                res, p, v
+            );
         }
     }
 }
