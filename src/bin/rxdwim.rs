@@ -40,6 +40,7 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
 
         search.only_visible = 1;
         search.require = SEARCH_ANY;
+
         search.searchmask |= 1 << 6;
         search.winclassname = cstr.as_ptr();
         search.max_depth = -1;
@@ -48,15 +49,11 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
             //let windowlist_ret: *mut *mut Window = std::mem::uninitialized();
             //let nwindows_ret: ::libc::c_uint = std::ptr::null_mut();
             let mut v = std::mem::uninitialized();
-            let mut p = std::mem::uninitialized();
-            let r = xdo_search_windows(xdo, &search, &mut p, &mut v);
+            let mut p: *mut Window = std::mem::uninitialized();
+            let res = xdo_search_windows(xdo, &search, &mut p, &mut v);
 
-            //let ptr = &p[1] as *const Window;
-
-            println!("xdo_search_windows: {}, count={}", r, v);
+            println!("xdo_search_windows: {}, count={}", res, v);
         }
-
-        let w: Window;
     }
 }
 
