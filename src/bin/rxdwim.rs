@@ -54,8 +54,8 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
         println!("Looking for classname: {:?} in desktop: {}", cstr, desktop);
         search.only_visible = 1;
         search.require = SEARCH_ANY;
-        search.searchmask |= 1 << 4;
-        search.searchmask |= 1 << 6;
+        search.searchmask |= 1 << 4; // only visible
+        search.searchmask |= 1 << 6; // classname
         search.winclassname = cstr.as_ptr();
         search.max_depth = -1;
         search.desktop = desktop;
@@ -78,7 +78,7 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
         let matched_windows = std::slice::from_raw_parts(windows, nwindows as usize);
         let mut topmost_window: Window = matched_windows[nwindows as usize - 1];
 
-        if topmost_window == active_window && nwindows >= 2 {
+        if topmost_window == active_window && nwindows > 1 {
             println!("index {}", nwindows - 2);
             topmost_window = matched_windows[nwindows as usize - 2];
         }
