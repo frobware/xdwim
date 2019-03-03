@@ -31,7 +31,9 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
         Err(err) => {
             println!("couldn't read message: {}", err);
         }
-        Ok(_) => {}
+        Ok(_) => {
+            line.pop();
+        }
     }
 
     let v: Vec<&str> = line.split(' ').collect();
@@ -41,15 +43,23 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
     }
 
     let mut search = Struct_xdo_search::default();
-    let cstr = CString::new(v[0]).expect("no nul bytes");
-
-    search.only_visible = 1;
-    search.require = SEARCH_ANY;
-    search.searchmask |= 1 << 6;
-    search.winclassname = cstr.as_ptr();
-    search.max_depth = -1;
+    let words: Vec<&str> = line.split('.').collect();
+    let cstr = CString::new(words[0]).expect("no nul bytes");
 
     unsafe {
+        let mut desktop = std::mem::uninitialized();
+
+        xdo_get_current_desktop(xdo, &mut desktop);
+
+        println!("Looking for classname: {:?} in desktop: {}", cstr, desktop);
+        search.only_visible = 1;
+        search.require = SEARCH_ANY;
+        search.searchmask |= 1 << 4;
+        search.searchmask |= 1 << 6;
+        search.winclassname = cstr.as_ptr();
+        search.max_depth = -1;
+        search.desktop = desktop;
+
         let mut nwindows = std::mem::uninitialized();
         let mut windows: *mut Window = std::mem::uninitialized();
 
@@ -63,25 +73,31 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
             return;
         }
 
-        let slice = std::slice::from_raw_parts(windows, nwindows as usize);
-        let mut topmost_window = slice[0];
+        println!("number of windows: {}", nwindows);
 
-        if topmost_window == active_window && nwindows >= 1 {
-            topmost_window = slice[1];
+        let matched_windows = std::slice::from_raw_parts(windows, nwindows as usize);
+        let mut topmost_window: Window = matched_windows[nwindows as usize - 1];
+
+        if topmost_window == active_window && nwindows >= 2 {
+            println!("index {}", nwindows - 2);
+            topmost_window = matched_windows[nwindows as usize - 2];
         }
 
         if topmost_window != active_window {
-            xdo_activate_window(xdo, topmost_window);
-            xdo_focus_window(xdo, topmost_window);
+            if xdo_activate_window(xdo, topmost_window) == 0 {
+                xdo_focus_window(xdo, topmost_window);
+            }
         }
 
-        match writer.write(b"success\n") {
+        match writer.write_all(b"success\n") {
             Err(err) => {
                 println!("couldn't send message: {}", err);
                 return;
             }
             Ok(_) => {}
         }
+
+        println!("Success!\n");
     }
 }
 
