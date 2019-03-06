@@ -1,18 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/env bash
 
-import sys
-import os
-import socket
-import subprocess
-
-server_address = '/tmp/xdwim.sock'
-sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-
-try:
-    sock.connect(server_address)
-    sock.sendall(sys.argv[1] + "\n")
-    data = sock.recv(32)
-    if data != "success\n":
-        subprocess.Popen(sys.argv[2:], close_fds=True)
-finally:
-    sock.close()
+echo -n "$1" | nc -U /tmp/xdwim.sock | while read; do
+    if [ $REPLY != "success" ]; then
+	shift;
+	echo $@
+    fi
+done
