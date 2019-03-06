@@ -32,10 +32,22 @@ fn search_windows(xdo: *mut xdo_t, classname: &str) -> Vec<Window> {
         let mut nwindows = std::mem::uninitialized();
         let mut windows: *mut Window = std::mem::uninitialized();
         if xdo_search_windows(xdo, &search, &mut windows, &mut nwindows) != 0 {
+            libc::free(windows as *mut _);
             return Vec::new();
         }
-        return std::slice::from_raw_parts(windows, nwindows as usize).to_vec();
+        let v = std::slice::from_raw_parts(windows, nwindows as usize).to_vec();
+        libc::free(windows as *mut _);
+        return v;
     }
+}
+
+fn focus_window(xdo: *mut xdo_t, window: Window) -> bool {
+    unsafe {
+        if xdo_activate_window(xdo, window) == 0 {
+            return xdo_focus_window(xdo, window) == 0;
+        }
+    }
+    return false;
 }
 
 fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
@@ -49,8 +61,6 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
         }
         Ok(_) => {}
     }
-
-    println!("request: {}", line);
 
     let v: Vec<&str> = line.split(' ').collect();
 
@@ -78,24 +88,16 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
             topmost_window = matched_windows[matched_windows.len() - 2];
         }
 
-        if topmost_window != active_window {
-            if xdo_activate_window(xdo, topmost_window) == 0 {
-                if xdo_focus_window(xdo, topmost_window) != 0 {
+        if focus_window(xdo, topmost_window) {
+            match writer.write_all(b"success\n") {
+                Err(err) => {
+                    println!("couldn't send message: {}", err);
                     return;
                 }
+                Ok(_) => {}
             }
         }
     }
-
-    match writer.write_all(b"success\n") {
-        Err(err) => {
-            println!("couldn't send message: {}", err);
-            return;
-        }
-        Ok(_) => {}
-    }
-
-    println!("Success!\n");
 }
 
 fn main() -> Result<(), Box<std::error::Error>> {
