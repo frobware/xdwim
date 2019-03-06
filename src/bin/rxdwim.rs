@@ -15,7 +15,7 @@ use std::os::unix::net::UnixStream;
 use std::ptr;
 use x11::xlib::Window;
 
-fn search_windows(xdo: *mut xdo_t, classname: String) -> Vec<Window> {
+fn search_windows(xdo: *mut xdo_t, classname: &str) -> Vec<Window> {
     println!("searching for classname {:?}", classname);
 
     let cstr = CString::new(classname).expect("no nul bytes");
@@ -59,7 +59,7 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
     }
 
     let words: Vec<&str> = line.split('.').collect();
-    let matched_windows = search_windows(xdo, words[0].to_string());
+    let matched_windows = search_windows(xdo, words[0]);
 
     if matched_windows.len() == 0 {
         return;
@@ -80,20 +80,22 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
 
         if topmost_window != active_window {
             if xdo_activate_window(xdo, topmost_window) == 0 {
-                xdo_focus_window(xdo, topmost_window);
+                if xdo_focus_window(xdo, topmost_window) != 0 {
+                    return;
+                }
             }
         }
-
-        match writer.write_all(b"success\n") {
-            Err(err) => {
-                println!("couldn't send message: {}", err);
-                return;
-            }
-            Ok(_) => {}
-        }
-
-        println!("Success!\n");
     }
+
+    match writer.write_all(b"success\n") {
+        Err(err) => {
+            println!("couldn't send message: {}", err);
+            return;
+        }
+        Ok(_) => {}
+    }
+
+    println!("Success!\n");
 }
 
 fn main() -> Result<(), Box<std::error::Error>> {
