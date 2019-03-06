@@ -15,12 +15,30 @@ use std::os::unix::net::UnixStream;
 use std::ptr;
 use x11::xlib::Window;
 
-///#[link(name = "libxdo")]
+fn search_windows(xdo: *mut xdo_t, classname: String) -> Vec<Window> {
+    println!("searching for classname {:?}", classname);
 
-// unsafe fn switch_to_window(_xdo: *mut xdo_t, client: &str) -> bool {
-//     println!("looking for X11 client: {}", client);
-//     return true;
-// }
+    let cstr = CString::new(classname).expect("no nul bytes");
+    let mut search = Struct_xdo_search::default();
+
+    search.only_visible = 1;
+    search.require = SEARCH_ANY;
+    search.searchmask |= 1 << 4; // only visible
+    search.searchmask |= 1 << 6; // classname
+    search.winclassname = cstr.as_ptr();
+    search.max_depth = -1;
+
+    unsafe {
+        let mut nwindows = std::mem::uninitialized();
+        let mut windows: *mut Window = std::mem::uninitialized();
+
+        if xdo_search_windows(xdo, &search, &mut windows, &mut nwindows) != 0 {
+            return Vec::new();
+        }
+
+        return std::slice::from_raw_parts(windows, nwindows as usize).to_vec();
+    }
+}
 
 fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
     let mut reader = BufReader::new(&stream);
@@ -31,10 +49,10 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
         Err(err) => {
             println!("couldn't read message: {}", err);
         }
-        Ok(_) => {
-            line.pop();
-        }
+        Ok(_) => {}
     }
+
+    println!("line: {}", line);
 
     let v: Vec<&str> = line.split(' ').collect();
 
@@ -46,20 +64,16 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
     let words: Vec<&str> = line.split('.').collect();
     let cstr = CString::new(words[0]).expect("no nul bytes");
 
+    println!("Looking for classname: {:?}", cstr);
+    search.only_visible = 1;
+    search.require = SEARCH_ANY;
+    search.searchmask |= 1 << 4; // only visible
+    search.searchmask |= 1 << 6; // classname
+    search.winclassname = cstr.as_ptr();
+    search.winclassname = CString::new(words[0]).expect("no nul bytes").as_ptr();
+    search.max_depth = -1;
+
     unsafe {
-        let mut desktop = std::mem::uninitialized();
-
-        xdo_get_current_desktop(xdo, &mut desktop);
-
-        println!("Looking for classname: {:?} in desktop: {}", cstr, desktop);
-        search.only_visible = 1;
-        search.require = SEARCH_ANY;
-        search.searchmask |= 1 << 4; // only visible
-        search.searchmask |= 1 << 6; // classname
-        search.winclassname = cstr.as_ptr();
-        search.max_depth = -1;
-        search.desktop = desktop;
-
         let mut nwindows = std::mem::uninitialized();
         let mut windows: *mut Window = std::mem::uninitialized();
 
