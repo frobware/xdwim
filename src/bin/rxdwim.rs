@@ -31,11 +31,9 @@ fn search_windows(xdo: *mut xdo_t, classname: String) -> Vec<Window> {
     unsafe {
         let mut nwindows = std::mem::uninitialized();
         let mut windows: *mut Window = std::mem::uninitialized();
-
         if xdo_search_windows(xdo, &search, &mut windows, &mut nwindows) != 0 {
             return Vec::new();
         }
-
         return std::slice::from_raw_parts(windows, nwindows as usize).to_vec();
     }
 }
@@ -52,7 +50,7 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
         Ok(_) => {}
     }
 
-    println!("line: {}", line);
+    println!("request: {}", line);
 
     let v: Vec<&str> = line.split(' ').collect();
 
@@ -60,41 +58,24 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
         return;
     }
 
-    let mut search = Struct_xdo_search::default();
     let words: Vec<&str> = line.split('.').collect();
-    let cstr = CString::new(words[0]).expect("no nul bytes");
+    let matched_windows = search_windows(xdo, words[0].to_string());
 
-    println!("Looking for classname: {:?}", cstr);
-    search.only_visible = 1;
-    search.require = SEARCH_ANY;
-    search.searchmask |= 1 << 4; // only visible
-    search.searchmask |= 1 << 6; // classname
-    search.winclassname = cstr.as_ptr();
-    search.winclassname = CString::new(words[0]).expect("no nul bytes").as_ptr();
-    search.max_depth = -1;
+    if matched_windows.len() == 0 {
+        return;
+    }
 
     unsafe {
-        let mut nwindows = std::mem::uninitialized();
-        let mut windows: *mut Window = std::mem::uninitialized();
-
-        if xdo_search_windows(xdo, &search, &mut windows, &mut nwindows) != 0 || nwindows < 1 {
-            return;
-        }
-
         let mut active_window: Window = std::mem::uninitialized();
 
         if xdo_get_active_window(xdo, &mut active_window) != 0 {
             return;
         }
 
-        println!("number of windows: {}", nwindows);
+        let mut topmost_window: Window = matched_windows[matched_windows.len() - 1];
 
-        let matched_windows = std::slice::from_raw_parts(windows, nwindows as usize);
-        let mut topmost_window: Window = matched_windows[nwindows as usize - 1];
-
-        if topmost_window == active_window && nwindows > 1 {
-            println!("index {}", nwindows - 2);
-            topmost_window = matched_windows[nwindows as usize - 2];
+        if topmost_window == active_window && matched_windows.len() > 1 {
+            topmost_window = matched_windows[matched_windows.len() - 2];
         }
 
         if topmost_window != active_window {
