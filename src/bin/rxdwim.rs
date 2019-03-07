@@ -12,6 +12,7 @@ use std::io::BufWriter;
 use std::io::Write;
 use std::os::unix::net::UnixListener;
 use std::os::unix::net::UnixStream;
+use std::path::Path;
 use std::ptr;
 use x11::xlib::Window;
 
@@ -96,7 +97,9 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
 }
 
 fn main() -> Result<(), Box<std::error::Error>> {
-    fs::remove_file(xdwim::SOCKET_PATH)?;
+    if Path::new(xdwim::SOCKET_PATH).exists() {
+        fs::remove_file(xdwim::SOCKET_PATH)?;
+    }
 
     let xdo: *mut xdo_t;
 
