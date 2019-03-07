@@ -3,3 +3,6 @@ all:
 
 install:
 	cargo install --root $$HOME/.local --force
+
+%:
+	cargo $@
