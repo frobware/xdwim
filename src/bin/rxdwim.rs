@@ -16,6 +16,7 @@ use std::ptr;
 use x11::xlib::Window;
 
 fn search_windows(xdo: *mut xdo_t, classname: &str) -> Vec<Window> {
+    println!("searching for {}", classname);
     let cstr = CString::new(classname).expect("no nul bytes");
     let mut search = Struct_xdo_search::default();
 
@@ -60,13 +61,7 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
         Ok(_) => {}
     }
 
-    let v: Vec<&str> = line.split(' ').collect();
-
-    if v.len() == 0 {
-        return;
-    }
-
-    let words: Vec<&str> = line.split('.').collect();
+    let words: Vec<&str> = line.split(' ').collect();
     let matched_windows = search_windows(xdo, words[0]);
 
     if matched_windows.len() == 0 {
