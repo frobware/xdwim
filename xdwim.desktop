@@ -2,7 +2,7 @@
 Name=rxdwim
 GenericName=rxdwim
 Comment=Start these up at login
-Exec=xdwim
+Exec=rxdwim
 Terminal=False
 Type=Application
 X-GNOME-Autostart-enabled=true
