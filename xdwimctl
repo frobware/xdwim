@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-echo -n "$1" | nc -U /tmp/xdwim.sock | while read; do
-    if [ $REPLY != "success" ]; then
-	shift;
-	exec $@
-    fi
-done
