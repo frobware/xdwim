@@ -1,6 +1,6 @@
 [Desktop Entry]
-Name=xdwim
-GenericName=xdwim
+Name=rxdwim
+GenericName=rxdwim
 Comment=Start these up at login
 Exec=xdwim
 Terminal=False
