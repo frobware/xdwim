@@ -4,4 +4,4 @@
 
 Make xdotool DWIM.
 
-Also my first Rust program. 
+Also my first Rust program. I like what I see.
