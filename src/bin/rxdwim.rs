@@ -16,8 +16,6 @@ use std::ptr;
 use x11::xlib::Window;
 
 fn search_windows(xdo: *mut xdo_t, classname: &str) -> Vec<Window> {
-    println!("searching for classname {:?}", classname);
-
     let cstr = CString::new(classname).expect("no nul bytes");
     let mut search = Struct_xdo_search::default();
 
@@ -88,15 +86,17 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
             topmost_window = matched_windows[matched_windows.len() - 2];
         }
 
-        if focus_window(xdo, topmost_window) {
-            match writer.write_all(b"success\n") {
-                Err(err) => {
-                    println!("couldn't send message: {}", err);
-                    return;
-                }
-                Ok(_) => {}
-            }
+        if !focus_window(xdo, topmost_window) {
+            return;
         }
+    }
+
+    match writer.write_all(b"success\n") {
+        Err(err) => {
+            println!("couldn't send message: {}", err);
+            return;
+        }
+        Ok(_) => {}
     }
 }
 
