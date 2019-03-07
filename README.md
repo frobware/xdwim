@@ -1,8 +1,7 @@
 # xdwim
-Make xdotool DWIM
 
-# Dependencies
+[![Build Status](https://travis-ci.com/frobware/xdwim.svg?branch=master)](https://travis-ci.org/frobware/xdwim)
 
-	$ sudo dnf install libxdo xdotool
-	$ pip install --user python-libxdo
-	
+Make xdotool DWIM.
+
+Also my first Rust program. 
