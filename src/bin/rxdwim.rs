@@ -63,8 +63,11 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
     }
 
     let words: Vec<&str> = line.split(' ').collect();
-    let matched_windows = search_windows(xdo, words[0]);
+    if words.len() == 0 {
+        return;
+    }
 
+    let matched_windows = search_windows(xdo, words[0]);
     if matched_windows.len() == 0 {
         return;
     }
