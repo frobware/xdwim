@@ -17,7 +17,6 @@ use std::ptr;
 use x11::xlib::Window;
 
 fn search_windows(xdo: *mut xdo_t, classname: &str) -> Vec<Window> {
-    println!("searching for {}", classname);
     let cstr = CString::new(classname).expect("no nul bytes");
     let mut search = Struct_xdo_search::default();
 
