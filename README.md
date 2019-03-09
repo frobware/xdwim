@@ -30,7 +30,7 @@ These are both present in my fork on the "xdwim" branch:
 This is how I use it on Gnome with dconf:
 
 ```bash
-dconf load /org/gnome/settings-daemon/plugins/media-keys/ <<EOF
+$ dconf load /org/gnome/settings-daemon/plugins/media-keys/ <<EOF
 [/]
 custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/emacs/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminal/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/browser/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnus/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/pdf/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/maxvertically/']
 
