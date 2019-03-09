@@ -1,0 +1,38 @@
+#!/bin/sh
+
+set -xe
+
+dconf load /org/gnome/settings-daemon/plugins/media-keys/ <<EOF
+[/]
+custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/emacs/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminal/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/browser/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnus/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/pdf/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/maxvertically/']
+
+[custom-keybindings/emacs]
+binding='<Alt><Shift>e'
+command="rxdwimctl emacs bash -login -c 'emacsclient -c --alternate-editor=\"\" --frame-parameters=\"((reverse . t))\"'"
+name='Emacs'
+
+[custom-keybindings/terminal]
+binding='<Alt><Shift>n'
+command="rxdwimctl Gnome-terminal gnome-terminal"
+name='Terminal'
+
+[custom-keybindings/browser]
+binding='<Control><Alt><Shift>n'
+command="rxdwimctl google-chrome google-chrome"
+name='Browser'
+
+[custom-keybindings/gnus]
+binding='<Control><Alt><Shift>m'
+command="rxdwimctl gnus gnus"
+name='Mail'
+
+[custom-keybindings/pdf]
+binding='<Control><Alt><Shift>p'
+command=" evince evince"
+name='PDF Viewer'
+
+[custom-keybindings/maxvertically]
+binding='<Control><Alt><Shift>v'
+command="wmctrl -r :ACTIVE: -b toggle,maximized_vert"
+name='MaxVertically'
+EOF
