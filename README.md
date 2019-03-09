@@ -18,7 +18,7 @@ not maintained. By binding to `libxdo` it will maintain z-order.
 
 This is how I use it on Gnome with dconf:
 
-```
+```bash
 dconf load /org/gnome/settings-daemon/plugins/media-keys/ <<EOF
 [/]
 custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/emacs/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminal/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/browser/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnus/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/pdf/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/maxvertically/']
@@ -58,3 +58,15 @@ EOF
 This was also my first Rust program. And I like what I see. As I learn
 a new programming language I always (seem to) gravitate to the parts
 that interact with C - Rust's FFI seems fabulous.
+
+# xdotool fixes
+
+I noticed that libxdo was leaking badly (another reason I'm looking at
+Rust) and raised the following PRs:
+
+- [https://github.com/jordansissel/xdotool/pull/241](https://github.com/jordansissel/xdotool/pull/241)
+- [https://github.com/jordansissel/xdotool/pull/242](https://github.com/jordansissel/xdotool/pull/242)
+
+These are both present in my fork:
+
+- [https://github.com/frobware/xdotool/tree/xdwim](https://github.com/frobware/xdotool/tree/xdwim)
