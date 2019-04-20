@@ -4,7 +4,12 @@ set -xe
 
 dconf load /org/gnome/settings-daemon/plugins/media-keys/ <<EOF
 [/]
-custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/emacs/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminal/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/browser/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnus/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/pdf/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/maxvertically/']
+custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/invert/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/emacs/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminal/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/browser/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnus/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/pdf/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/maxvertically/']
+
+[custom-keybindings/invert]
+binding='<Control><Alt><Shift>i'
+command="xcalib -i -a"
+name='Invert Screen'
 
 [custom-keybindings/emacs]
 binding='<Alt><Shift>e'
