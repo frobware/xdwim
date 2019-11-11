@@ -4,7 +4,7 @@ set -xe
 
 dconf load /org/gnome/settings-daemon/plugins/media-keys/ <<EOF
 [/]
-custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/invert/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/emacs/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminal/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/browser/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnus/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/pdf/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/maxvertically/']
+custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/invert/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/emacs/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminal/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/browser/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnus/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/pdf/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/maxvertically/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/firefox/']
 
 [custom-keybindings/invert]
 binding='<Control><Alt><Shift>i'
@@ -25,6 +25,11 @@ name='Terminal'
 binding='<Control><Alt><Shift>n'
 command="rxdwimctl google-chrome google-chrome"
 name='Browser'
+
+[custom-keybindings/firefox]
+binding='<Control><Alt><Shift>f'
+command="switch-to-firefox"
+name='firefox'
 
 [custom-keybindings/gnus]
 binding='<Control><Alt><Shift>m'
