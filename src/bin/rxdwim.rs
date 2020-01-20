@@ -28,8 +28,8 @@ fn search_windows(xdo: *mut xdo_t, classname: &str) -> Vec<Window> {
     search.max_depth = -1;
 
     unsafe {
-        let mut nwindows = std::mem::uninitialized();
-        let mut windows: *mut Window = std::mem::uninitialized();
+        let mut nwindows = { std::mem::MaybeUninit::uninit().assume_init() };
+        let mut windows: *mut Window = { std::mem::MaybeUninit::uninit().assume_init() };
         if xdo_search_windows(xdo, &search, &mut windows, &mut nwindows) != 0 {
             libc::free(windows as *mut _);
             return Vec::new();
@@ -72,7 +72,7 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
     }
 
     unsafe {
-        let mut active_window: Window = std::mem::uninitialized();
+        let mut active_window: Window = { std::mem::MaybeUninit::uninit().assume_init() };
 
         if xdo_get_active_window(xdo, &mut active_window) != 0 {
             return;
@@ -98,7 +98,7 @@ fn handle_client(xdo: *mut xdo_t, stream: UnixStream) {
     }
 }
 
-fn main() -> Result<(), Box<std::error::Error>> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     if Path::new(xdwim::SOCKET_PATH).exists() {
         fs::remove_file(xdwim::SOCKET_PATH)?;
     }
