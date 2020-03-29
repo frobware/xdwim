@@ -10,5 +10,6 @@ with import <nixpkgs> {};
     pkgconfig
     rustc
     xdotool
+    direnv
   ];
 }
