@@ -1,6 +1,5 @@
 extern crate xdwim;
 
-use std::env;
 use std::io::BufRead;
 use std::io::BufReader;
 use std::io::Write;
@@ -9,13 +8,6 @@ use std::path::Path;
 use std::process::Command;
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-
-    if args.len() <= 2 {
-        println!("insufficient arguments!");
-        return;
-    }
-
     let socket = Path::new(xdwim::SOCKET_PATH);
 
     let mut stream = match UnixStream::connect(&socket) {
@@ -26,14 +18,20 @@ fn main() {
         Ok(stream) => stream,
     };
 
-    let joined = &args[1..].join(" ");
+    let mut args = Vec::new();
 
-    match stream.write(joined.as_bytes()) {
-        Err(err) => panic!("couldn't send message: {}", err),
-        Ok(_) => {}
+    for arg in std::env::args().skip(1) {
+	args.push(arg);
     }
 
-    match stream.write("\n".as_bytes()) {
+    if args.len() < 2 {
+        println!("insufficient arguments!");
+        return;
+    }
+
+    let joined = args.join(" ") + "\n";
+
+    match stream.write(joined.as_bytes()) {
         Err(err) => panic!("couldn't send message: {}", err),
         Ok(_) => {}
     }
