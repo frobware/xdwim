@@ -2,7 +2,7 @@
 # It is not intended for manual editing.
 [[package]]
 name = "libc"
-version = "0.2.68"
+version = "0.2.79"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -10,13 +10,13 @@ name = "libxdo-sys"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "libc 0.2.68 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)",
  "x11 2.18.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "pkg-config"
-version = "0.3.17"
+version = "0.3.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -24,21 +24,21 @@ name = "x11"
 version = "2.18.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "libc 0.2.68 (registry+https://github.com/rust-lang/crates.io-index)",
- "pkg-config 0.3.17 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pkg-config 0.3.19 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "xdwim"
 version = "0.1.0"
 dependencies = [
- "libc 0.2.68 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)",
  "libxdo-sys 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "x11 2.18.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [metadata]
-"checksum libc 0.2.68 (registry+https://github.com/rust-lang/crates.io-index)" = "dea0c0405123bba743ee3f91f49b1c7cfb684eef0da0a50110f758ccf24cdff0"
+"checksum libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)" = "2448f6066e80e3bfc792e9c98bf705b4b0fc6e8ef5b43e5889aff0eaa9c58743"
 "checksum libxdo-sys 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)" = "db23b9e7e2b7831bbd8aac0bbeeeb7b68cbebc162b227e7052e8e55829a09212"
-"checksum pkg-config 0.3.17 (registry+https://github.com/rust-lang/crates.io-index)" = "05da548ad6865900e60eaba7f589cc0783590a92e940c26953ff81ddbab2d677"
+"checksum pkg-config 0.3.19 (registry+https://github.com/rust-lang/crates.io-index)" = "3831453b3449ceb48b6d9c7ad7c96d5ea673e9b470a1dc578c2ce6521230884c"
 "checksum x11 2.18.2 (registry+https://github.com/rust-lang/crates.io-index)" = "77ecd092546cb16f25783a5451538e73afc8d32e242648d54f4ae5459ba1e773"
