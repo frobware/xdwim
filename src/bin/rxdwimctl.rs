@@ -29,9 +29,7 @@ fn main() {
         return;
     }
 
-    let joined = args.join(" ") + "\n";
-
-    match stream.write(joined.as_bytes()) {
+    match stream.write((args.join(" ") + "\n").as_bytes()) {
         Err(err) => panic!("couldn't send message: {}", err),
         Ok(_) => {}
     }
