@@ -1,0 +1,8 @@
+cmake_minimum_required (VERSION 3.21)
+project("xdwim")
+install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/xdwim DESTINATION bin)
+file(GLOB xdwim_SRC "xdwim.c")
+file(GLOB xdwimctl_SRC "xdwimctl.c")
+add_executable(xdwim ${xdwim_SRC})
+add_executable(xdwimctl ${xdwimctl_SRC})
+target_link_libraries(xdwim xdo)

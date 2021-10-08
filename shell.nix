@@ -11,5 +11,12 @@ with import <nixpkgs> {};
     rustc
     xdotool
     direnv
+    gdb
+    x11
+    valgrind
+    cmake
+    clang
+    clang-analyzer
+    cppcheck
   ];
 }
