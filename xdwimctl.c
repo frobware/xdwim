@@ -42,15 +42,10 @@ int main(int argc, char *argv[])
 	int sockfd;
 	struct sockaddr_un addr;
 	char *windowclass;
-	char line[256] = { '\0' };
+	char line[32] = { '\0' };
 
 	if (argc < 3) {
 		fprintf(stderr, "usage: <windowclass> <program>\n");
-		exit(EXIT_FAILURE);
-	}
-
-	if (signal(SIGPIPE, SIG_IGN) != 0) {
-		perror("signal");
 		exit(EXIT_FAILURE);
 	}
 
@@ -68,9 +63,7 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	windowclass = mprintf("%s\n", argv[1]);
-
-	if (windowclass == NULL) {
+	if ((windowclass = mprintf("%s\n", argv[1])) == NULL) {
 		perror("malloc");
 		exit(EXIT_FAILURE);
 	}
@@ -88,10 +81,15 @@ int main(int argc, char *argv[])
 	}
 
 	if (strcmp(line, "success\n") != 0) {
-		fprintf(stderr, "**** starting %s\n", argv[2]);
-		if (system(argv[2]) == -1) {
-			perror("system");
-			exit(EXIT_FAILURE);
+		int pid = fork();
+		if (pid == 0) {
+			if (execvpe(argv[2], &argv[3], environ) == -1) {
+				perror("execve");
+				exit(EXIT_FAILURE);
+			}
+		} else if (pid == -1) {
+			perror("fork");
+			exit(EXIT_SUCCESS);
 		}
 	}
 
