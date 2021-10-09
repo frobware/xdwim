@@ -18,5 +18,6 @@ with import <nixpkgs> {};
     clang
     clang-analyzer
     cppcheck
+    manpages
   ];
 }
