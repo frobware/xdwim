@@ -23,7 +23,7 @@ name='Terminal'
 
 [custom-keybindings/browser]
 binding='<Control><Alt><Shift>n'
-command="xdwimctl google-chrome google-chrome"
+command="xdwimctl google-chrome google-chrome-stable"
 name='Browser'
 
 [custom-keybindings/firefox]

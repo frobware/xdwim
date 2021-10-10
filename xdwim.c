@@ -13,8 +13,9 @@
 
 #include "xdwim.h"
 
-static void activate_windowclass(xdo_t *xdo, int client_fd, const char *windowclass)
+static int activate_windowclass(xdo_t *xdo, const char *windowclass)
 {
+	int rc = XDO_ERROR;
 	xdo_search_t search;
 	unsigned int n_matched_windows;
 	Window *matched_windows = NULL;
@@ -29,7 +30,7 @@ static void activate_windowclass(xdo_t *xdo, int client_fd, const char *windowcl
 	search.max_depth = -1;
 
 	if (xdo_search_windows(xdo, &search, &matched_windows, &n_matched_windows) != XDO_SUCCESS) {
-		return;
+		return XDO_ERROR;
 	}
 
 	if (n_matched_windows == 0) {
@@ -48,14 +49,13 @@ static void activate_windowclass(xdo_t *xdo, int client_fd, const char *windowcl
 
 	if (xdo_activate_window(xdo, topmost_window) == XDO_SUCCESS) {
 		if (xdo_focus_window(xdo, topmost_window) == XDO_SUCCESS) {
-			if (write(client_fd, "success\n", 8) != 8) {
-				perror("write");
-			}
+			rc = XDO_SUCCESS;
 		}
 	}
 
 out:
 	free(matched_windows);
+	return rc;
 }
 
 int main()
@@ -64,36 +64,39 @@ int main()
 	struct sockaddr_un addr;
 	xdo_t *xdo;
 	char *windowclass;
+	struct sigaction act;
 
-	if (signal(SIGPIPE, SIG_IGN) != 0) {
-		perror("signal");
-		exit(EXIT_FAILURE);
+	memset(&act, 0, sizeof(act));
+	act.sa_handler = SIG_IGN;
+	act.sa_flags = SA_RESTART;
+	if (sigaction(SIGPIPE, &act, NULL)) {
+		fprintf(stderr, "sigaction: %s", strerror(errno));
+		exit(EXIT_FAILURE+2);
 	}
 
 	if ((xdo = xdo_new(NULL)) == NULL) {
 		fprintf(stderr, "could not initialise xdo: %s\n", strerror(errno));
-		exit(EXIT_FAILURE);
+		exit(EXIT_FAILURE+3);
 	}
 
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
 	snprintf(addr.sun_path, sizeof(addr.sun_path)-1, SOCKPATH_FMT);
+	unlink(addr.sun_path);
 
 	if ((listen_fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
 		fprintf(stderr, "error: socket: %s\n", strerror(errno));
-		exit(EXIT_FAILURE);
+		exit(EXIT_FAILURE+4);
 	}
-
-	unlink(addr.sun_path);
 
 	if (bind(listen_fd, &addr, sizeof(addr)) != 0) {
 		fprintf(stderr, "error: bind(%s): %s\n", addr.sun_path, strerror(errno));
-		exit(EXIT_FAILURE);
+		exit(EXIT_FAILURE+5);
 	}
 
 	if (listen(listen_fd, 5) != 0) {
 		fprintf(stderr, "error: listen: %s\n", strerror(errno));
-		exit(EXIT_FAILURE);
+		exit(EXIT_FAILURE+6);
 	}
 
 	while (1) {
@@ -111,9 +114,16 @@ int main()
 		}
 
 		*strchr(line, '\n') = '\0';
+		fprintf(stdout, "activate %s\n", line);
 
 		if ((windowclass = strtok(line, " ")) != NULL) {
-			activate_windowclass(xdo, cl, windowclass);
+			int rc = activate_windowclass(xdo, windowclass);
+			if (rc == XDO_SUCCESS) {
+				if (write(cl, "success\n", 8) != 8) {
+					fprintf(stderr, "error: write: %s", strerror(errno));
+				}
+			}
+			fprintf(stdout, "activate rc=%s\n", rc == XDO_SUCCESS ? "OK" : "Error");
 		}
 
 		close(cl);
