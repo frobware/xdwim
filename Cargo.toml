@@ -1,9 +1,0 @@
-[package]
-name = "xdwim"
-version = "0.1.0"
-authors = ["Andrew McDermott <aim@frobware.com>"]
-
-[dependencies]
-libxdo-sys = "0.11.0"
-libc = "0.2.49"
-x11 = "2.18.1"
