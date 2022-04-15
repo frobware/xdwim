@@ -99,6 +99,11 @@ int main()
 		exit(EXIT_FAILURE+6);
 	}
 
+        if (daemon(0, 0) != 0) {
+		fprintf(stderr, "error: failed to daemonize: %s\n", strerror(errno));
+		exit(EXIT_FAILURE+7);
+        }
+
 	while (1) {
 		int cl;
 		char line[256] = { '\0' };
