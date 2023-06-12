@@ -148,8 +148,11 @@ int main(int argc, char *argv[])
 				if (write(cl, "success\n", 8) != 8) {
 					fprintf(stderr, "error: write: %s\n", strerror(errno));
 				}
+			} else {
+				if (write(cl, "notfound\n", 9) != 9) {
+					fprintf(stderr, "error: write: %s\n", strerror(errno));
+				}
 			}
-			fprintf(stdout, "activate rc=%s\n", rc == XDO_SUCCESS ? "OK" : "Error");
 		}
 
 		close(cl);
