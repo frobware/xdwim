@@ -1,42 +1,66 @@
 {
-  description = "Devlopement shell for the xdwim project";
+  description = "A Nix flake for the xdwim project";
 
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
-    flake-utils.url = "github:numtide/flake-utils";
-  };
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
+  inputs.flake-utils.url = "github:numtide/flake-utils";
 
   outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = nixpkgs.legacyPackages.${system};
-      in {
-        devShell = pkgs.stdenv.mkDerivation {
-          name = "xdwim";
+  flake-utils.lib.eachSystem [ "aarch64-linux" "x86_64-linux" ] (system:
+  let
+    name = "xdwim";
+    src = ./.;
+    pkgs = nixpkgs.legacyPackages.${system};
 
-          # nativeBuildInputs: build time dependencies.
-          nativeBuildInputs = with pkgs; [
-            gcc
-            gdb
-            gnumake
-            lcov
-            llvmPackages.clang
-            pkg-config
-            valgrind
-            xdotool
-            xorg.libX11
-          ];
+    buildInputs = with pkgs; [
+      cunit
+      xdo
+    ];
 
-          # buildInputs: for runtime dependencies.
-          buildInputs = with pkgs; [
-            cunit
-            xdo
-          ];
+    nativeBuildInputs = with pkgs; [
+      cmake
+      xdotool
+      xorg.libX11
+    ];
 
-          shellHook = ''
-            export CMAKE_BUILD_TYPE=Debug
-          '';
-        };
-      }
-    );
+    devInputs = with pkgs; [
+      gdb
+      lcov
+      llvmPackages.clang
+      valgrind
+    ] ++ nativeBuildInputs;
+
+    xdwimPackage = pkgs.stdenv.mkDerivation {
+      inherit name src nativeBuildInputs buildInputs;
+
+      doCheck = true;
+
+      unpackPhase = ''
+      '';
+
+      configurePhase = ''
+        rm GNUmakefile
+        cmake -DCMAKE_INSTALL_PREFIX="$out" .
+      '';
+
+      buildPhase = ''
+        make
+      '';
+
+      checkPhase = ''
+        make test ARGS=-v
+      '';
+
+      installPhase = ''
+        mkdir -p $out/bin && make install
+      '';
+    };
+  in
+  {
+    packages.${name} = xdwimPackage;
+    packages.default = xdwimPackage;
+
+    devShells.default = pkgs.mkShell {
+      inherit buildInputs devInputs;
+    };
+  });
 }
