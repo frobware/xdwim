@@ -72,9 +72,8 @@ _deps
 # External projects
 *-prefix/
 
-# End of https://www.toptal.com/developers/gitignore/api/c,cmake
+# End of https://www.toptal.com/developers/gitignore/api/c,cmake# CMake build
 
-# CMake build
+/.cache/
+/.direnv/
 /build/
-/xdwim
-/xdwimctl

@@ -2,30 +2,48 @@
 #define INCLUDE_XDWIM_H
 
 #include <unistd.h>
+#include <errno.h>
 
-#define SOCKPATH_FMT "/tmp/xdwim.sock"
+typedef ssize_t (*xdwim_read_fn_t)(int, void *, size_t);
 
-static inline int readln(int fd, char *s, size_t sz) {
+xdwim_read_fn_t xdwim_read = read;
+
+ssize_t xdwim_readln(int fd, char *s, size_t sz) {
 	size_t i;
+	char c;
+	int last_err = 0;
+	int newline_read = 0;
 
-	for (i = 0; i < sz; i++) {
-		int rc;
-		if ((rc = read(fd, &s[i], 1)) != 1) {
-			return rc;
-		}
-		if (s[i] == '\n' || s[i] == '\0') {
+	if (s == NULL || sz < 1) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	for (i = 0; i < sz - 1; i++) {
+		if (xdwim_read(fd, &c, 1) < 1) {
+			last_err = errno;
 			break;
 		}
-	}
-
-	if (s[i] == '\n') {
-		if (i+1 < sz) {
-			s[i+1] = '\0';
-			return 0;
+		if (c == '\n') {
+			newline_read = 1;
+			s[i] = '\0';
+			break;
 		}
+		s[i] = c;
 	}
 
-	return -1;
+	if (!newline_read) {
+		// If no characters were read and there was an error
+		// with the read system call (last_err != 0), then set
+		// errno to last_err, otherwise if no newline was
+		// found set errno to ENOBUFS.
+		errno = (i == 0 && last_err != 0) ? last_err : ENOBUFS;
+		return -1;
+	}
+
+	s[i] = '\0';
+
+	return i;
 }
 
-#endif /* INCLUDE_XDWIM_H */
+#endif	/* INCLUDE_XDWIM_H */

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 set -xe
 
@@ -30,16 +30,6 @@ name='Browser'
 binding='<Control><Alt><Shift>f'
 command="switch-to-firefox"
 name='firefox'
-
-[custom-keybindings/gnus]
-binding='<Control><Alt><Shift>m'
-command="xdwimctl gnus gnus"
-name='Mail'
-
-[custom-keybindings/pdf]
-binding='<Control><Alt><Shift>p'
-command=" evince evince"
-name='PDF Viewer'
 
 [custom-keybindings/maxvertically]
 binding='<Control><Alt><Shift>v'

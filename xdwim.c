@@ -13,6 +13,14 @@
 
 #include "xdwim.h"
 
+#ifndef SOCKPATH_FMT
+#define SOCKPATH_FMT "/tmp/xdwim.sock"
+#endif
+
+#ifndef MAX_LINE_LEN
+#define MAX_LINE_LEN 128
+#endif
+
 static int activate_windowclass(xdo_t *xdo, const char *windowclass)
 {
 	int rc = XDO_ERROR;
@@ -58,13 +66,26 @@ out:
 	return rc;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
 	int listen_fd;
 	struct sockaddr_un addr;
 	xdo_t *xdo;
 	char *windowclass;
 	struct sigaction act;
+	int run_as_daemon = 0;
+        int opt;
+
+	while ((opt = getopt(argc, argv, "d")) != -1) {
+		switch (opt) {
+		case 'd':
+			run_as_daemon = 1;
+			break;
+		default:
+			fprintf(stderr, "Usage: %s [-d]\n", argv[0]);
+			exit(EXIT_FAILURE);
+		}
+	}
 
 	memset(&act, 0, sizeof(act));
 	act.sa_handler = SIG_IGN;
@@ -99,33 +120,33 @@ int main()
 		exit(EXIT_FAILURE+6);
 	}
 
-        if (daemon(0, 0) != 0) {
-		fprintf(stderr, "error: failed to daemonize: %s\n", strerror(errno));
-		exit(EXIT_FAILURE+7);
-        }
+	if (run_as_daemon) {
+		if (daemon(0, 0) != 0) {
+			fprintf(stderr, "error: failed to daemonize: %s\n", strerror(errno));
+			exit(EXIT_FAILURE+7);
+		}
+	}
 
 	while (1) {
 		int cl;
-		char line[256] = { '\0' };
+                char line[MAX_LINE_LEN];
 
 		if ((cl = accept4(listen_fd, NULL, NULL, 0)) == -1) {
 			fprintf(stderr, "error: accept: %s\n", strerror(errno));
 			continue;
 		}
 
-		if (readln(cl, line, sizeof(line)) == -1) {
+		if (xdwim_readln(cl, line, MAX_LINE_LEN) == -1) {
+			perror("getline");
 			close(cl);
 			continue;
 		}
-
-		*strchr(line, '\n') = '\0';
-		fprintf(stdout, "activate %s\n", line);
 
 		if ((windowclass = strtok(line, " ")) != NULL) {
 			int rc = activate_windowclass(xdo, windowclass);
 			if (rc == XDO_SUCCESS) {
 				if (write(cl, "success\n", 8) != 8) {
-					fprintf(stderr, "error: write: %s", strerror(errno));
+					fprintf(stderr, "error: write: %s\n", strerror(errno));
 				}
 			}
 			fprintf(stdout, "activate rc=%s\n", rc == XDO_SUCCESS ? "OK" : "Error");

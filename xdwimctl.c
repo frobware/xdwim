@@ -1,4 +1,4 @@
-#define _GNU_SOURCE             /* See feature_test_macros(7) */
+#define _GNU_SOURCE /* See feature_test_macros(7) */
 
 #include <stdio.h>
 #include <string.h>
@@ -12,6 +12,14 @@
 #include <sys/un.h>
 
 #include "xdwim.h"
+
+#ifndef SOCKPATH_FMT
+#define SOCKPATH_FMT "/tmp/xdwim.sock"
+#endif
+
+#ifndef MAX_LINE_LEN
+#define MAX_LINE_LEN 128
+#endif
 
 static char *mprintf(const char *fmt, ...)
 {
@@ -42,7 +50,7 @@ int main(int argc, char *argv[])
 	int sockfd;
 	struct sockaddr_un addr;
 	char *windowclass;
-	char line[32] = { '\0' };
+	char line[MAX_LINE_LEN];
 
 	if (argc < 3) {
 		fprintf(stderr, "usage: <windowclass> <program>\n");
@@ -51,14 +59,14 @@ int main(int argc, char *argv[])
 
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
-	snprintf(addr.sun_path, sizeof(addr.sun_path)-1, SOCKPATH_FMT);
+	snprintf(addr.sun_path, sizeof(addr.sun_path) - 1, SOCKPATH_FMT);
 
 	if ((sockfd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
 		perror("socket error");
 		exit(EXIT_FAILURE);
 	}
 
-	if (connect(sockfd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
+	if (connect(sockfd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
 		perror("connect");
 		exit(EXIT_FAILURE);
 	}
@@ -68,19 +76,19 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	if (write(sockfd, windowclass, strlen(windowclass)) != strlen(windowclass)) {
+	if (write(sockfd, windowclass, strlen(windowclass)) != (ssize_t)strlen(windowclass)) {
 		perror("write");
 		exit(EXIT_FAILURE);
 	}
 
 	free(windowclass);
 
-	if (readln(sockfd, line, sizeof(line)) == -1) {
-		perror("read");
+	if (xdwim_readln(sockfd, line, MAX_LINE_LEN) == -1) {
+		perror("getline");
 		exit(EXIT_FAILURE);
 	}
 
-	if (strcmp(line, "success\n") != 0) {
+	if (strcmp(line, "success") != 0) {
 		int pid = fork();
 		if (pid == 0) {
 			if (execvpe(argv[2], &argv[3], environ) == -1) {
@@ -89,7 +97,7 @@ int main(int argc, char *argv[])
 			}
 		} else if (pid == -1) {
 			perror("fork");
-			exit(EXIT_SUCCESS);
+			exit(EXIT_FAILURE);
 		}
 	}
 
