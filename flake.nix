@@ -1,10 +1,16 @@
 {
   description = "A Nix flake for the xdwim project";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
-  inputs.flake-utils.url = "github:numtide/flake-utils";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
+    flake-utils.url = "github:numtide/flake-utils";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils, home-manager }:
   flake-utils.lib.eachSystem [ "aarch64-linux" "x86_64-linux" ] (system:
   let
     name = "xdwim";
@@ -62,5 +68,8 @@
     devShells.default = pkgs.mkShell {
       inherit buildInputs devInputs;
     };
+
+    homeManagerModules.xdwim = import ./module/xdwim.nix;
+    homeManagerModules.default = self.homeManagerModules.xdwim;
   });
 }
