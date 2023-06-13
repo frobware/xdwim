@@ -57,7 +57,7 @@ add_custom_target(coverage
   COMMENT "Generating code coverage report"
 )
 
-option(ENABLE_CODE_COVERAGE "Enable code coverage" ON)
+option(ENABLE_CODE_COVERAGE "Enable code coverage" OFF)
 if(ENABLE_CODE_COVERAGE)
   if(CMAKE_C_COMPILER_ID MATCHES "Clang")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
