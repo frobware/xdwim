@@ -28,7 +28,7 @@ add_executable(tests tests.c ${HDRS})
 target_link_libraries(tests cunit)
 
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
-  target_compile_definitions(tests PRIVATE -DCU_VERBOSE=1 -DC_SILENT=0)
+  target_compile_definitions(tests PRIVATE -DCU_VERBOSE=1 -DCU_SILENT=0)
   # Enable code coverage for debug builds
   set(ENABLE_CODE_COVERAGE ON)
 endif()
@@ -83,5 +83,3 @@ if(CMAKE_EXPORT_COMPILE_COMMANDS)
   # definitions/declarations.
   set(CMAKE_C_STANDARD_INCLUDE_DIRECTORIES ${CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES})
 endif()
-
-# foo
