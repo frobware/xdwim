@@ -77,3 +77,4 @@ _deps
 /.cache/
 /.direnv/
 /build/
+/result
