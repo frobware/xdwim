@@ -76,6 +76,16 @@ int main(int argc, char *argv[])
 	int run_as_daemon = 0;
         int opt;
 
+	if (getenv("DISPLAY") == NULL) {
+		fprintf(stderr, "error: no DISPLAY set; exiting.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	if (getenv("XDG_SESSION_TYPE") != NULL && strcmp("wayland", getenv("XDG_SESSION_TYPE")) == 0) {
+		fprintf(stderr, "error: XDG_SESSION_TYPE is wayland; exiting.\n");
+		exit(EXIT_FAILURE);
+	}
+
 	while ((opt = getopt(argc, argv, "d")) != -1) {
 		switch (opt) {
 		case 'd':
