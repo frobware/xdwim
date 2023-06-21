@@ -12,11 +12,27 @@ elseif(CMAKE_C_COMPILER_ID MATCHES "GNU")
   set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Og -ggdb3 -fno-inline -fno-omit-frame-pointer")
 endif()
 
+find_package(PkgConfig)
+
+pkg_check_modules(XDO REQUIRED IMPORTED_TARGET libxdo)
+if(TARGET PkgConfig::XDO)
+  message(STATUS "xdo found")
+else()
+  message(FATAL_ERROR "xdo not found")
+endif()
+
+pkg_check_modules(CUNIT REQUIRED IMPORTED_TARGET cunit)
+if(TARGET PkgConfig::CUNIT)
+  message(STATUS "cunit found")
+else()
+  message(FATAL_ERROR "cunit not found")
+endif()
+
 set(HDRS xdwim.h)
 
 set(xdwim_SRC xdwim.c)
 add_executable(xdwim ${xdwim_SRC} ${HDRS})
-target_link_libraries(xdwim xdo)
+target_link_libraries(xdwim PkgConfig::XDO)
 
 set(xdwimctl_SRC xdwimctl.c)
 add_executable(xdwimctl ${xdwimctl_SRC} ${HDRS})
@@ -25,7 +41,7 @@ install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/xdwim DESTINATION bin)
 install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/xdwimctl DESTINATION bin)
 
 add_executable(tests tests.c ${HDRS})
-target_link_libraries(tests cunit)
+target_link_libraries(tests PkgConfig::CUNIT)
 
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
   target_compile_definitions(tests PRIVATE -DCU_VERBOSE=1 -DCU_SILENT=0)

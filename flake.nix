@@ -24,6 +24,7 @@
     nativeBuildInputs = with pkgs; [
       cmake
       cunit
+      pkg-config
       xdotool
       xorg.libX11
     ];
