@@ -18,12 +18,12 @@
     pkgs = nixpkgs.legacyPackages.${system};
 
     buildInputs = with pkgs; [
-      cunit
       xdo
     ];
 
     nativeBuildInputs = with pkgs; [
       cmake
+      cunit
       xdotool
       xorg.libX11
     ];
