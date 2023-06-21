@@ -66,7 +66,7 @@
     packages.default = xdwimPackage;
 
     devShells.default = pkgs.mkShell {
-      inherit buildInputs devInputs;
+      inherit buildInputs devInputs nativeBuildInputs;
     };
 
     homeManagerModules.xdwim = import ./module/xdwim.nix;
