@@ -1,5 +1,7 @@
 # xdwim
 
+[ I've finally switched to Wayland and now use https://github.com/CZ-NIC/run-or-raise. ]
+
 Make xdotool DWIM.
 
 I use this as dumb hotkey manager on Gnome.
